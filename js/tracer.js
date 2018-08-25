@@ -234,8 +234,10 @@ class Tracer {
     }
     
     static play() {
-        this.playing = true;
-        this.tick(0, 0);
+        if(!this.playing){
+            this.playing = true;
+            this.tick(0, 0);
+        }
     }
     
     static stop() {
