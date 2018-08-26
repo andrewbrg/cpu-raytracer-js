@@ -18,16 +18,37 @@
             <div class="col-sm-0 col-md-1"></div>
             <div class="col-sm-12 col-md-10">
                 <canvas id="tracerCanvas" style="width:100%;"></canvas>
-                <div class="fps">FPS: <span>n/a</span></div>
-                <div class="form-group">
-                    <label for="fov">Field of View</label>
-                    <input type="number" 
-                           class="form-control" 
-                           id="fov" 
-                           value="60"
-                           aria-describedby="fov" 
-                           placeholder="Field of View"
-                           onchange="Tracer.setFov(this.value);">
+                <span class="badge badge-success">
+                    <div class="fps">FPS: <span>n/a</span></div>    
+                </span>
+                <br />
+                <div class="row">
+                    <div class="col-sm-12 col-md-6">
+                        <div class="form-group">
+                            <label for="fieldFov">Field of View</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="fieldFov" 
+                                   value="60"
+                                   aria-describedby="fieldFov" 
+                                   placeholder="Field of View"
+                                   onchange="Tracer.setFov(this.value);">
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <div class="form-group">
+                            <label for="fieldDepth">Trace Depth</label>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="fieldDepth" 
+                                   value="1"
+                                   min="1"
+                                   max="5"
+                                   aria-describedby="fieldDepth" 
+                                   placeholder="Trace Depth"
+                                   onchange="Tracer.setDepth(this.value);">
+                        </div>
+                    </div>
                 </div>
                 <button onclick="Tracer.play()">Play</button>
                 <button onclick="Tracer.stop()">Stop</button>
@@ -55,6 +76,10 @@
         Tracer.init('tracerCanvas');
         
         let fpsEl = $('.fps').find('span');
+        
+        $('#fieldFov').val(Tracer.getFov());
+        $('#fieldDepth').val(Tracer.getDepth());
+        
         window.setInterval(() => {
             fpsEl.html(Tracer.getFps());
         },300);
