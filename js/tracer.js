@@ -14,8 +14,7 @@ class Tracer {
       
         this.canvasCtx     = canvas.getContext('2d'),
         this.canvasData    = this.canvasCtx.getImageData(0, 0, width, height);
-        
-        this.useWorkers = true;
+
         this.setScene();
         this.tick();
     }
