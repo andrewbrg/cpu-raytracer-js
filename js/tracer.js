@@ -14,48 +14,50 @@ class Tracer {
         this.canvasCtx     = canvas.getContext('2d'),
         this.canvasData    = this.canvasCtx.getImageData(0, 0, width, height);
         
+        this.setScene();
+        this.render();
+    }
+    
+    static setScene() {
+        
         let surfaceA = new Surface(
-            {x: 255, y: 30, z: 120},
+            new Vector(255, 30, 120),
             0.3,
             0.5,
             0.1
         );
         
         let surfaceB = new Surface(
-            {x: 80, y: 10, z: 200},
+            new Vector(80, 20, 200),
             0.1,
             0.6,
             0.1
         );
         
         let surfaceC = new Surface(
-            {x: 255, y: 255, z: 255},
+            new Vector(255, 255, 255),
             0.2,
             0.6,
             0.1
-        )
+        );
         
         this.scene = {
-            camera: {
-                fov: 60,
-                point: {x: 0, y: 1.8, z: 10},
-                vector: {x: 0, y: 3, z: 0}
-            },
-            lights: [{
-                x: -30, 
-                y: -10, 
-                z: 20
-            }],
+            camera: new Camera(
+                60, 
+                new Vector(0, 1.8, 10),
+                new Vector(0, 3, 0)
+            ),
+            lights: [
+                new Vector(-30, -10, 20)
+            ],
             objs: [
-                new Sphere({x: 0, y: 3.5, z: -3}, 3, surfaceA),
-                new Sphere({x: -4, y: 2, z: -1}, 0.2, surfaceB),
-                new Sphere({x: -4, y: 3, z: -1}, 0.1, surfaceC)
+                new Sphere(new Vector(0, 3.5, -3), 3, surfaceA),
+                new Sphere(new Vector(-4, 2, -1), 0.2, surfaceB),
+                new Sphere(new Vector(-4, 3, -1), 0.1, surfaceC)
             ]
         };
-        
-        this.render();
     }
-    
+
     static generateRays() {
 
         let eyeVect  = VectMath.unit(VectMath.sub(this.scene.camera.vector, this.scene.camera.point));
@@ -101,8 +103,8 @@ class Tracer {
             this.generateRays();
         }
         
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
+        for (let x = 0; x < this.rays.length; x++) {
+            for (let y = 0; y < this.rays[0].length; y++) {
                 
                 color = this.trace(this.rays[x][y], 0);
                 index = (x * 4) + (y * 4 * this.width);
@@ -217,6 +219,8 @@ class Tracer {
     
     static tick(obj1, obj2) {
 
+        this.lastTick = new Date();
+     
         obj1 += 0.1;
         obj2 += 0.2;
    
@@ -229,7 +233,13 @@ class Tracer {
         this.render();
   
         if (this.playing) {
-            window.setTimeout(() => {this.tick(obj1, obj2)}, 10);
+            window.setTimeout(() => {
+                this.tick(obj1, obj2);
+                let thisTick = new Date();
+                this.fps = (1000 / (thisTick - this.lastTick)).toFixed(2);
+                this.lastTick = thisTick;
+            }, 
+            10);
         }
     }
     
@@ -251,5 +261,12 @@ class Tracer {
     static setFov(fov) {
         this.scene.camera.fov = fov;
         this.rays = null;
+    }
+    
+    static getFps() {
+        if(!this.playing){
+            return 0;
+        }
+        return this.fps;
     }
 }
