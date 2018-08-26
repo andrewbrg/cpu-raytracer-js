@@ -1,10 +1,10 @@
 class Tracer {
     
-    static init(canvasId, width = 500, height = 400, depth = 1) {
+    static init(canvasId, width = 500, height = 400, depth = 2) {
         
         this.width  = width;
         this.height = height;
-        this.depth  = depth ;
+        this.depth  = depth;
 
         let canvas = document.getElementById(canvasId);
         
@@ -15,7 +15,7 @@ class Tracer {
         this.canvasData    = this.canvasCtx.getImageData(0, 0, width, height);
         
         this.setScene();
-        this.render();
+        this.tick();
     }
     
     static setScene() {
@@ -56,6 +56,11 @@ class Tracer {
                 new Sphere(new Vector(-4, 3, -1), 0.1, surfaceC)
             ]
         };
+    }
+    
+    static createWorkers() {
+        
+        
     }
 
     static generateRays() {
@@ -217,13 +222,12 @@ class Tracer {
         return intSec.distance > -0.005;
     }
     
-    static tick(obj1, obj2) {
+    static tick(obj1 = 0, obj2 = 0) {
 
-        this.lastTick = new Date();
-     
         obj1 += 0.1;
         obj2 += 0.2;
    
+        this.lastTick = new Date();
         this.scene.objs[1].point.x = Math.sin(obj1) * 3.5;
         this.scene.objs[1].point.z = -3 + (Math.cos(obj1) * 3.5);
     
@@ -239,7 +243,7 @@ class Tracer {
                 this.fps = (1000 / (thisTick - this.lastTick)).toFixed(2);
                 this.lastTick = thisTick;
             }, 
-            10);
+            5);
         }
     }
     
@@ -254,8 +258,16 @@ class Tracer {
         this.playing = false;
     }
     
+    static getDepth() {
+        return this.depth;
+    }
+
     static setDepth(depth) {
         this.depth = depth;
+    }
+    
+    static getFov() {
+        return this.scene.camera.fov;
     }
     
     static setFov(fov) {
