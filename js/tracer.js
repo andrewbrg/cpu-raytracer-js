@@ -1,10 +1,11 @@
 class Tracer {
     
-    static init(canvasId, width = 500, height = 400, depth = 2) {
+    static init(canvasId, width = 500, height = 400, depth = 2, maxWorkers = 10) {
         
         this.width  = width;
         this.height = height;
         this.depth  = depth;
+        this.maxWorkers = 10;
 
         let canvas = document.getElementById(canvasId);
         
@@ -14,6 +15,7 @@ class Tracer {
         this.canvasCtx     = canvas.getContext('2d'),
         this.canvasData    = this.canvasCtx.getImageData(0, 0, width, height);
         
+        this.useWorkers = true;
         this.setScene();
         this.tick();
     }
@@ -57,22 +59,12 @@ class Tracer {
             ]
         };
     }
-    
-    static createWorkers() {
-        
-        
-    }
 
     static generateRays() {
 
         let eyeVect  = VectMath.unit(VectMath.sub(this.scene.camera.vector, this.scene.camera.point));
         let eyeVectR = VectMath.unit(VectMath.cross(eyeVect, VectMath.make('up')));
         let eyeVectU = VectMath.unit(VectMath.cross(eyeVectR, eyeVect));
-        
-        this.rays = new Array(this.width);
-        for (let i = 0; i < this.rays.length; i++) {
-          this.rays[i] = new Array(this.height);
-        }
 
         this.fovRad = Math.PI * (this.scene.camera.fov / 2) / 180;
         this.halfW  = Math.tan(this.fovRad);
@@ -80,9 +72,11 @@ class Tracer {
         this.pxW    = (this.halfW * 2) / (this.width - 1);
         this.pxH    = (this.halfH * 2) / (this.height - 1);
         
+        this.rays = [];
+    
         for (let x = 0; x < this.width; x++) {
             for (let y = 0; y < this.height; y++) {
-                this.rays[x][y] = {
+                this.rays.push({
                     x: x,
                     y: y,
                     vector: VectMath.unit(
@@ -95,7 +89,7 @@ class Tracer {
                         )
                     ),
                     point: this.scene.camera.point
-                };
+                });
             }
         }
     }
@@ -107,24 +101,22 @@ class Tracer {
         if(!this.rays) {
             this.generateRays();
         }
-        
-        for (let x = 0; x < this.rays.length; x++) {
-            for (let y = 0; y < this.rays[0].length; y++) {
-                
-                color = this.trace(this.rays[x][y], 0);
-                index = (x * 4) + (y * 4 * this.width);
-                
-                this.canvasData.data[index + 0] = color.x;
-                this.canvasData.data[index + 1] = color.y;
-                this.canvasData.data[index + 2] = color.z;
-                this.canvasData.data[index + 3] = 255;
-            }
-        }
+
+        this.rays.forEach((ray) => {
+            
+            color = this.trace(ray);
+            index = (ray.x * 4) + (ray.y * 4 * this.width);
+            
+            this.canvasData.data[index + 0] = color.x;
+            this.canvasData.data[index + 1] = color.y;
+            this.canvasData.data[index + 2] = color.z;
+            this.canvasData.data[index + 3] = 255;
+        });
     
         this.canvasCtx.putImageData(this.canvasData, 0, 0);
     }
     
-    static trace(ray, depth) {
+    static trace(ray, depth = 0) {
         
         if (depth > this.depth) {
             return;
