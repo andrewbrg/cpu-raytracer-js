@@ -1,11 +1,10 @@
 class Tracer {
     
-    static init(canvasId, width = 800, height = 400, depth = 1, maxWorkers = 10) {
+    static init(canvasId, width = 600, height = 260, depth = 1) {
         
         this.width  = width;
         this.height = height;
         this.depth  = depth;
-        this.maxWorkers = 10;
 
         let canvas = document.getElementById(canvasId);
         
@@ -29,32 +28,24 @@ class Tracer {
         );
         
         let surfaceB = new Surface(
-            new Vector(80, 20, 200),
+            new Vector(80, 120, 200),
             0.1,
-            0.6,
-            0.1
-        );
-        
-        let surfaceC = new Surface(
-            new Vector(255, 255, 255),
-            0.2,
             0.6,
             0.1
         );
         
         this.scene = {
             camera: new Camera(
-                60, 
-                new Vector(0, 0, 20),
+                50, 
+                new Vector(0, 0, 25),
                 new Vector(0, 0, 0)
             ),
             lights: [
                 new Vector(-20, -10, 20)
             ],
             objs: [
-                new Sphere(new Vector(0, 0, 0), 3, surfaceA),
-                new Sphere(new Vector(-2, 0, 4), 0.45, surfaceB),
-                new Sphere(new Vector(-3, 0, 2), 0.2, surfaceC)
+                new Sphere(new Vector(0, 0, 0), 3.5, surfaceA),
+                new Sphere(new Vector(-2, 0, 5), 0.65, surfaceB)
             ]
         };
     }
