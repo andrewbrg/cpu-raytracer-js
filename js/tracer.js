@@ -1,6 +1,6 @@
 class Tracer {
     
-    static init(canvasId, width = 500, height = 400, depth = 2, maxWorkers = 10) {
+    static init(canvasId, width = 800, height = 400, depth = 1, maxWorkers = 10) {
         
         this.width  = width;
         this.height = height;
@@ -22,10 +22,10 @@ class Tracer {
     static setScene() {
         
         let surfaceA = new Surface(
-            new Vector(255, 30, 120),
-            0.3,
-            0.5,
-            0.1
+            new Vector(145, 30, 120),
+            1,
+            0.4,
+            0.05
         );
         
         let surfaceB = new Surface(
@@ -45,16 +45,16 @@ class Tracer {
         this.scene = {
             camera: new Camera(
                 60, 
-                new Vector(0, 1.8, 10),
-                new Vector(0, 3, 0)
+                new Vector(0, 0, 20),
+                new Vector(0, 0, 0)
             ),
             lights: [
-                new Vector(-30, -10, 20)
+                new Vector(-20, -10, 20)
             ],
             objs: [
-                new Sphere(new Vector(0, 3.5, -3), 3, surfaceA),
-                new Sphere(new Vector(-4, 2, -1), 0.2, surfaceB),
-                new Sphere(new Vector(-4, 3, -1), 0.1, surfaceC)
+                new Sphere(new Vector(0, 0, 0), 3, surfaceA),
+                new Sphere(new Vector(-2, 0, 4), 0.45, surfaceB),
+                new Sphere(new Vector(-3, 0, 2), 0.2, surfaceC)
             ]
         };
     }
@@ -213,35 +213,61 @@ class Tracer {
         return intSec.distance > -0.005;
     }
     
-    static tick(obj1 = 0, obj2 = 0) {
+    static tick(speeds = [], cDirs = []) {
 
-        obj1 += 0.1;
-        obj2 += 0.2;
-   
+        if(speeds.length === 0) {
+            for(let i = 0; i < this.scene.objs.length; i++) {
+                speeds[i] = Math.random() / 3;
+            }
+        }
+        
+  
         this.lastTick = new Date();
-        this.scene.objs[1].point.x = Math.sin(obj1) * 3.5;
-        this.scene.objs[1].point.z = -3 + (Math.cos(obj1) * 3.5);
-    
-        this.scene.objs[2].point.x = Math.sin(obj2) * 4;
-        this.scene.objs[2].point.z = -3 + (Math.cos(obj2) * 4);
-    
+        
+        let i = 0;
+        this.scene.objs.forEach(obj => {
+            ['x', 'y'].forEach(c => {
+                cDirs[i] = cDirs[i] !== undefined ? cDirs[i] : [];
+                if(obj.surface.color[c] <= 0){
+                    obj.surface.color[c] = 0;
+                    cDirs[i][c] = 'u';
+                }
+                else if(obj.surface.color[c] >= 255){
+                    obj.surface.color[c] = 255;
+                    cDirs[i][c] = 'd';
+                }
+                obj.surface.color[c] += cDirs.length > 0 && cDirs[i][c] === 'u' ? 5 : -5;
+            });
+            
+            i++;
+        });
+        
+        for(let i = 1; i < this.scene.objs.length; i++) {
+            let x = this.scene.objs[i].point.x;
+            let y = this.scene.objs[i].point.y;
+            let z = this.scene.objs[i].point.z;
+            this.scene.objs[i].point.x = x * Math.cos(speeds[i]) - z * Math.sin(speeds[i]);
+            this.scene.objs[i].point.z = z * Math.cos(speeds[i]) + x * Math.sin(speeds[i]);
+            this.scene.objs[i].point.y = y * Math.cos(speeds[i]) - z * Math.sin(speeds[i]);
+        }
+        
         this.render();
   
         if (this.playing) {
             window.setTimeout(() => {
-                this.tick(obj1, obj2);
+                this.tick(speeds, cDirs);
                 let thisTick = new Date();
                 this.fps = (1000 / (thisTick - this.lastTick)).toFixed(2);
                 this.lastTick = thisTick;
             }, 
-            5);
+            20);
         }
     }
     
     static play() {
         if(!this.playing){
             this.playing = true;
-            this.tick(0, 0);
+            this.tick();
         }
     }
     
