@@ -3,4 +3,4 @@ This project is a very very simple ray tracer (https://en.wikipedia.org/wiki/Ray
 
 It's wrtten is a less performance optimized but more readable manner to facilitate readablity of the code and math behind it. To get started simply download the project and run `demo.html`.
 
-_based on a literate raytracer in javascript http://macwright.org/literate-raytracer/ _
+_*based on a literate raytracer in javascript http://macwright.org/literate-raytracer/_
