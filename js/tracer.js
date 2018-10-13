@@ -1,6 +1,6 @@
 class Tracer {
     
-    static init(canvasId, width = 600, height = 260, depth = 1) {
+    static init(canvasId, width = 800, height = 600, depth = 2) {
         
         this.width  = width;
         this.height = height;
