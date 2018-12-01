@@ -5,4 +5,6 @@ It's written manner which is not so optimized for performance but on the other h
 
 _*based on a literate raytracer in javascript http://macwright.org/literate-raytracer/
 
-![Ray Tracer Perview](https://i.ibb.co/3spt6PR/Screenshot-2018-12-01-at-01-31-43.png)
+<p align="center">
+  <img src="https://i.ibb.co/3spt6PR/Screenshot-2018-12-01-at-01-31-43.png" alt="Ray Tracer Perview"/>
+</p>
